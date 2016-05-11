@@ -1,6 +1,6 @@
-(ns ast-parser.core
+(ns synfnetic.core
   ;; FOR ACCESS TO MACROS, DO NOT DELETE
-  #?(:cljs (:require-macros [ast-parser.core :refer [m-do]]))
+  #?(:cljs (:require-macros [synfnetic.core :refer [m-do]]))
 
   #?(:cljs (:require [cljs.reader :refer [read-string]])))
 

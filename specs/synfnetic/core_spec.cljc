@@ -1,9 +1,9 @@
-(ns ast-parser.core-spec
+(ns synfnetic.core-spec
   #?(:cljs (:require-macros
-             [ast-parser.core-spec :refer [asserts complex]]))
+             [synfnetic.core-spec :refer [asserts complex]]))
   (:require [untangled-spec.core #?(:clj :refer :cljs :refer-macros)
              [specification component behavior assertions]]
-            [ast-parser.core :as P&
+            [synfnetic.core :as P&
              #?(:clj :refer :cljs :refer-macros)
              [m-do defsyntax defsynfn synfn]]))
 

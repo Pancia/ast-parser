@@ -1,4 +1,4 @@
-(defproject ast-parser "0.1.0-SNAPSHOT"
+(defproject synfnetic "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.228"]
                  [org.omcljs/om "1.0.0-alpha32" :scope "provided"]
@@ -17,7 +17,7 @@
   :cljsbuild {:builds [{:id           "test"
                         :source-paths ["specs" "src"]
                         :figwheel     true
-                        :compiler     {:main                 ast-parser.spec-main
+                        :compiler     {:main                 synfnetic.spec-main
                                        :output-to            "resources/public/js/specs/specs.js"
                                        :output-dir           "resources/public/js/compiled/specs"
                                        :asset-path           "js/compiled/specs"

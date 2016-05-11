@@ -1,9 +1,9 @@
-(ns ast-parser.spec-main
+(ns synfnetic.spec-main
   (:require-macros
     [untangled-spec.reporters.suite :as ts])
   (:require
     untangled-spec.reporters.impl.suite
-    ast-parser.tests-to-run))
+    synfnetic.tests-to-run))
 
 (enable-console-print!)
 
