@@ -6,7 +6,7 @@
 
 (def fail (constantly []))
 
-(defn any [input]
+(defn any< [input]
   (if (empty? input) (fail)
     (vector [(first input)
              (rest input)])))
@@ -43,14 +43,14 @@
 #?(:clj (defmacro m-do [& forms]
           (reduce do* (last forms) (reverse (butlast forms)))))
 
-(defn pred [p]
-  (>>= any (fn [v] (if (p v) (return v) fail))))
+(defn pred< [p]
+  (>>= any< (fn [v] (if (p v) (return v) fail))))
 
-(defn cmp [p]
-  (fn [v] (pred (partial p v))))
+(defn cmp< [p]
+  (fn [v] (pred< (partial p v))))
 
-(def match (cmp =))
-(def noneOf (cmp not=))
+(def match< (cmp< =))
+(def noneOf< (cmp< not=))
 
 ;; (ab)
 (defn <&> [pa pb]
@@ -65,24 +65,23 @@
     (lazy-cat (parse-one p1 input) (parse-one p2 input))))
 
 ;; (a?)
-(defn optional [parser] (<|> parser (return [])))
+(defn optional< [parser] (<|> parser (return [])))
 
-(declare plus)
+(declare plus<)
 
 ;; (a*)
-(defn star [parser] (optional (plus parser)))
+(defn star< [parser] (optional< (plus< parser)))
 
 ;; (a+) => (aa*)
-(defn plus [parser]
+(defn plus< [parser]
   (m-do
     (a <- parser)
-    (as <- (star parser))
+    (as <- (star< parser))
     (return (vec (cons a as)))))
 
-(def digit (<$> (comp read-string str)
-                (pred #(re-find #"\d" (str %)))))
-(defn seq& [x] (reduce <&> (map #(match %) x)))
-(def string seq&)
+(def number< (pred< number?))
+(defn seq< [x] (reduce <&> (map #(match< %) x)))
+(def string< seq<)
 
 (defn syn* [arglist body]
   `(fn [args#]
