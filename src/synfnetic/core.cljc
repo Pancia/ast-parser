@@ -7,18 +7,24 @@
 (def ^:dynamic *dbg* false)
 (defn dbg [x] (when *dbg* (prn :dbg x)) x)
 
-(defrecord Fail [cause input])
+(defrecord State [seen])
+(defn make-state
+  ([] (make-state []))
+  ([seen] (->State seen)))
+
+(defrecord Fail [cause input state])
 (defn fail
-  ([cause input] [(->Fail cause input)])
-  ([cause] (fn [input] (fail cause input))))
+  ([cause input state] [(->Fail cause input state)])
+  ([cause] (fn [input state] (fail cause input state))))
 (defn fail? [x] (instance? Fail x))
 
-(defrecord Ok [value input])
-(defn ok [value input] [(->Ok value input)])
+(defrecord Ok [value input state])
+(defn ok [value input state]
+  [(->Ok value input state)])
 (defn ok? [x] (instance? Ok x))
 
-(defn parse-one [parser input]
-  (parser input))
+(defn parse-one [parser input & [state]]
+  (parser input (or state (make-state))))
 
 (def done? (comp empty? :input))
 (defn extract [x]
@@ -32,26 +38,27 @@
                  (map #(do (when (fail? %)
                              (reset! mrf %)) %))
                  (filter ok?))
-           (parse-one parser input))
+           (parse-one parser input (make-state)))
       first (#(or % @mrf))
       extract)))
 
 (defn return [v]
-  (fn [input]
-     (ok v input)))
+  (fn [input state]
+     (ok v input state)))
 
-(defn any< [input]
-  (if (empty? input) (fail ::empty [])
+(defn any< [input state]
+  (if (empty? input) (fail ::empty [] state)
     (ok (first input)
-        (rest  input))))
+        (rest  input)
+        (update state :seen conj (first input)))))
 
 (defn >>= [m f]
-  (fn [input]
+  (fn [input state]
     (sequence
-      (mapcat (fn [{:keys [value input] :as x}]
+      (mapcat (fn [{:keys [value input state] :as x}]
                 (if (fail? x) [x]
-                  (parse-one (f value) input))))
-      (parse-one m input))))
+                  (parse-one (f value) input state))))
+      (parse-one m input state))))
 
 (defn fmap [f m]
   (>>= m (comp return f)))
@@ -79,8 +86,9 @@
 
 ;; (a|b)
 (defn or< [p1 p2]
-  (fn [input]
-    (lazy-cat (parse-one p1 input) (parse-one p2 input))))
+  (fn [input state]
+    (lazy-cat (parse-one p1 input state)
+              (parse-one p2 input state))))
 (def <|> or<)
 
 ;; (a?)

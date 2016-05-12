@@ -12,20 +12,20 @@
   (let [input [0 1 2 3]]
     (assertions
       "fail"
-      (into {} (syn/fail :c :xs))
-      => {:cause :c :input :xs}
+      (into {} (syn/fail :c :xs :q))
+      => {:cause :c :input :xs :state :q}
 
       "ok"
-      (into {} (syn/ok :v :xs))
-      => {:value :v :input :xs}
+      (into {} (syn/ok :v :xs :s))
+      => {:value :v :input :xs :state :s}
 
       "parse-one & any<"
       (mapv #(into {} %) (syn/parse-one syn/any< input))
-      => [{:value 0 :input (rest input)}]
+      => [{:value 0 :input (rest input) :state (syn/make-state [0])}]
 
       "=<"
       (mapv #(into {} %) (syn/parse-one (syn/=< 0) input))
-      => [{:value 0 :input (rest input)}]
+      => [{:value 0 :input (rest input) :state (syn/make-state [0])}]
       (first (syn/parse-one (syn/=< 1) input))
       =fn=> syn/fail?
 
@@ -39,7 +39,8 @@
 
       "optional<"
       (mapv #(into {} %) (syn/parse-one (syn/optional< (syn/=< 0)) input))
-      => [{:value 0 :input (rest input)} {:value nil :input input}]
+      => [{:value 0 :input (rest input) :state (syn/make-state [0])}
+          {:value nil :input input :state (syn/make-state)}]
 
       "parse-all & star<"
       (syn/parse-all (syn/star< syn/any<) input)
@@ -53,7 +54,8 @@
       =throws=> (ExceptionInfo #"Parser failure"
                   #(-> % ex-data
                      (= {:cause [:when< 3]
-                         :input ()})))
+                         :input ()
+                         :state (syn/make-state [0 1 2 3])})))
 
       "not=<"
       (syn/parse-all (syn/not=< 13) [0])
@@ -62,7 +64,8 @@
       =throws=> (ExceptionInfo #""
                   #(-> % ex-data
                      (= {:cause [:when< 0]
-                         :input ()})))
+                         :input ()
+                         :state (syn/make-state [0])})))
 
       "plus<"
       (syn/parse-all (syn/plus< (syn/=< 0)) [0 0 0])
