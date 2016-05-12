@@ -41,9 +41,8 @@
       "when< & star<"
       (syn/parse-all (syn/star< (syn/when< #(<= 0 % 3))) input)
       => input
-      (binding [syn/*dbg* true]
-        (syn/parse-all (syn/star< (syn/when< #(<= 0 % 2))) input))
-      =throws=> (ExceptionInfo #"Parser failure"
+      (syn/parse-all (syn/star< (syn/when< #(<= 0 % 2))) input)
+      =throws=> (ExceptionInfo #"Parser Failure"
                   #(-> % ex-data
                      (= {:cause [:when< 3]
                          :input ()
@@ -65,11 +64,21 @@
       (syn/parse-all (syn/plus< (syn/when< vector?)) [[0] [1]])
       => [[0] [1]]
 
+      "parse a string just to show"
+      (syn/parse-all (syn/seq< "foobar") "foobar")
+      => [\f \o \o \b \a \r]
+      (syn/parse-all (syn/seq< "foo") "foobar")
+      =throws=> (ExceptionInfo #"Parser Error"
+                  #(-> % ex-data
+                     (= {:input [\b \a \r]
+                         :state (syn/make-state [\f \o \o])
+                         :last-saw [\f \o \o]})))
+
       "unparsable input"
       (into {} (first (syn/parse-one (syn/plus< syn/number<) [:x :y :z])))
       => {:cause [:when< :x] :input [:y :z] :state (syn/make-state [:x])}
       (syn/parse-all (syn/plus< syn/number<) [:x :y :z])
-      =throws=> (ExceptionInfo #"Parser failure"
+      =throws=> (ExceptionInfo #"Parser Failure"
                   #(-> % ex-data
                      (= {:cause [:when< :x]
                          :input [:y :z]

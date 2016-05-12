@@ -1,6 +1,7 @@
 (ns synfnetic.core
   ;; FOR ACCESS TO MACROS, DO NOT DELETE
-  #?(:cljs (:require-macros [synfnetic.core :refer [m-do]])))
+  #?(:cljs (:require-macros [synfnetic.core :refer [m-do]]))
+  (:require [clojure.set :as set]))
 
 (def ^:dynamic *dbg* false)
 (defn dbg
@@ -14,7 +15,7 @@
 
 (defrecord Fail [cause input state])
 (defn fail
-  ([cause input state] {:pre [(vector? cause)]} [(->Fail cause input state)])
+  ([cause input state] {:pre [(sequential? cause)]} [(->Fail cause input state)])
   ([cause] (fn [input state] (fail cause input state))))
 (defn fail? [x] (instance? Fail x))
 
@@ -31,15 +32,23 @@
 
 (defn parse-all [parser input]
   (let [mrf (atom nil)
-        track-fails #(do (when (fail? %) (reset! mrf %)) %)
+        mrk (atom nil)
+        track-fails #(do
+                       (when (ok? %)   (reset! mrk %))
+                       (when (fail? %) (reset! mrf %)) %)
         dref (fn [x]
-               (cond (ok? x) (:value x)
-                     :else (throw (ex-info "Parser failure" (into {} x)))))]
+               (cond (some-> x meta ::end)
+                     (throw (ex-info "Parser Error"
+                              (set/rename-keys (into {} x) {:value :last-saw})))
+                     (ok? x) (:value x)
+                     :else (throw (ex-info "Parser Failure"
+                                    (into {} x)))))]
     (->> (sequence
            (comp (map track-fails)
                  (filter (every-pred ok? done?)))
            (parse-one parser input (make-state)))
-      first (#(or % @mrf))
+      (#(do (dbg :MRF @mrf) %))
+      first (#(or % @mrf (with-meta @mrk {::end true})))
       dref)))
 
 (defn return [v] (ok v))
@@ -130,9 +139,8 @@
 (def    =< (cmp<    =    :=))
 (def not=< (cmp< not= :not=))
 
-(defn seq< [x] (reduce <&> (map #(=< %) x)))
+(defn seq< [x] (fmap flatten (reduce <&> (map #(=< %) x))))
 
-(def string< seq<)
 (def number< (when< number?))
 
 ;; PUBLIC MACROS
