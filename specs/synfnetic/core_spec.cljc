@@ -18,8 +18,8 @@
       "=<"
       (mapv #(into {} %) (syn/parse-one (syn/=< 0) input))
       => [{:value 0 :input (rest input) :state (syn/make-state [0])}]
-      (first (syn/parse-one (syn/=< 1) input))
-      =fn=> syn/fail?
+      (into {} (first (syn/parse-one (syn/=< 1) input)))
+      => {:cause [:when< 0 := 1] :input (rest input) :state (syn/make-state [0])}
 
       "<&>"
       (syn/parse-one (syn/<&> (syn/=< 0) (syn/=< 1)) input)
@@ -55,7 +55,7 @@
       (syn/parse-all (syn/not=< 0) [0])
       =throws=> (ExceptionInfo #""
                   #(-> % ex-data
-                     (= {:cause [:when< 0]
+                     (= {:cause [:when< 0 :not= 0]
                          :input ()
                          :state (syn/make-state [0])})))
 
@@ -63,7 +63,17 @@
       (syn/parse-all (syn/plus< (syn/=< 0)) [0 0 0])
       => [0 0 0]
       (syn/parse-all (syn/plus< (syn/when< vector?)) [[0] [1]])
-      => [[0] [1]])))
+      => [[0] [1]]
+
+      "unparsable input"
+      (into {} (first (syn/parse-one (syn/plus< syn/number<) [:x :y :z])))
+      => {:cause [:when< :x] :input [:y :z] :state (syn/make-state [:x])}
+      (syn/parse-all (syn/plus< syn/number<) [:x :y :z])
+      =throws=> (ExceptionInfo #"Parser failure"
+                  #(-> % ex-data
+                     (= {:cause [:when< :x]
+                         :input [:y :z]
+                         :state (syn/make-state [:x])}))))))
 
 (def arrow<
   (syn/when< #{'->}))

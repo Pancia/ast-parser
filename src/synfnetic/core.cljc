@@ -1,11 +1,11 @@
 (ns synfnetic.core
   ;; FOR ACCESS TO MACROS, DO NOT DELETE
-  #?(:cljs (:require-macros [synfnetic.core :refer [m-do dbg]]))
-
-  #?(:clj (:import (clojure.lang IDeref))))
+  #?(:cljs (:require-macros [synfnetic.core :refer [m-do]])))
 
 (def ^:dynamic *dbg* false)
-(defn dbg [x] (when *dbg* (prn :dbg x)) x)
+(defn dbg
+  ([tag x] (when *dbg* (prn tag x)) x)
+  ([x] (dbg :dbg x)))
 
 (defrecord State [seen])
 (defn make-state
@@ -14,7 +14,7 @@
 
 (defrecord Fail [cause input state])
 (defn fail
-  ([cause input state] [(->Fail cause input state)])
+  ([cause input state] {:pre [(vector? cause)]} [(->Fail cause input state)])
   ([cause] (fn [input state] (fail cause input state))))
 (defn fail? [x] (instance? Fail x))
 
@@ -31,14 +31,13 @@
 
 (defn parse-all [parser input]
   (let [mrf (atom nil)
+        track-fails #(do (when (fail? %) (reset! mrf %)) %)
         dref (fn [x]
                (cond (ok? x) (:value x)
                      :else (throw (ex-info "Parser failure" (into {} x)))))]
     (->> (sequence
-           (comp (filter done?)
-                 (map #(do (when (fail? %)
-                             (reset! mrf %)) %))
-                 (filter ok?))
+           (comp (map track-fails)
+                 (filter (every-pred ok? done?)))
            (parse-one parser input (make-state)))
       first (#(or % @mrf))
       dref)))
@@ -46,7 +45,7 @@
 (defn return [v] (ok v))
 
 (defn any< [input state]
-  (if (empty? input) (fail ::empty [] state)
+  (if (empty? input) (fail [::empty] [] state)
     (ok (first input)
         (rest  input)
         (update state :seen conj (first input)))))
@@ -74,6 +73,13 @@
           (reduce do* (last forms) (reverse (butlast forms)))))
 
 ;; PARSERS & COMBINATORS
+
+(defn <?> [p msg]
+  (fn [input state]
+    (sequence
+      (map #(cond-> % (fail? %)
+              (update :cause concat msg)))
+      (parse-one p input state))))
 
 ;; (ab)
 (defn and< [pa pb]
@@ -117,11 +123,12 @@
            (return v)
            (fail [:when< v])))))
 
-(defn cmp< [p]
-  (fn [v] (when< (partial p v))))
+(defn cmp< [p tag]
+  (fn [v] (<?> (when< (partial p v))
+               [tag v])))
 
-(def    =< (cmp< =))
-(def not=< (cmp< not=))
+(def    =< (cmp<    =    :=))
+(def not=< (cmp< not= :not=))
 
 (defn seq< [x] (reduce <&> (map #(=< %) x)))
 
