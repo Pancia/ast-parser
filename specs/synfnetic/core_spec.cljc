@@ -11,14 +11,6 @@
 (specification "ast parsing baby!"
   (let [input [0 1 2 3]]
     (assertions
-      "fail"
-      (into {} (syn/fail :c :xs :q))
-      => {:cause :c :input :xs :state :q}
-
-      "ok"
-      (into {} (syn/ok :v :xs :s))
-      => {:value :v :input :xs :state :s}
-
       "parse-one & any<"
       (mapv #(into {} %) (syn/parse-one syn/any< input))
       => [{:value 0 :input (rest input) :state (syn/make-state [0])}]
@@ -44,18 +36,18 @@
 
       "parse-all & star<"
       (syn/parse-all (syn/star< syn/any<) input)
-      => [0 1 2 3]
+      => input
 
       "when< & star<"
       (syn/parse-all (syn/star< (syn/when< #(<= 0 % 3))) input)
-      => [0 1 2 3]
+      => input
       (binding [syn/*dbg* true]
         (syn/parse-all (syn/star< (syn/when< #(<= 0 % 2))) input))
       =throws=> (ExceptionInfo #"Parser failure"
                   #(-> % ex-data
                      (= {:cause [:when< 3]
                          :input ()
-                         :state (syn/make-state [0 1 2 3])})))
+                         :state (syn/make-state input)})))
 
       "not=<"
       (syn/parse-all (syn/not=< 13) [0])
@@ -102,8 +94,7 @@
     (syn/parse-all blocks< '["foo" 3 -> 4])
     => '[["foo" [3 -> 4]]]
     (syn/parse-all blocks< '[5 -> 6 7 -> 8])
-    => '[[[5 -> 6] [7 -> 8]]]
-    ))
+    => '[[[5 -> 6] [7 -> 8]]]))
 
 (defsyntax asserts
   [blocks <- blocks<]
@@ -123,8 +114,7 @@
 
     ((complex 42    1 -> 2 "divider" 3 -> 4    :thing)
      #{42})
-    => [42 2 :thing]
-    ))
+    => [42 2 :thing]))
 
 (defsynfn maybe-fn-over-numbers
   [f <- (syn/<|> (syn/when< fn?)

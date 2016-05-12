@@ -19,20 +19,21 @@
 (defn fail? [x] (instance? Fail x))
 
 (defrecord Ok [value input state])
-(defn ok [value input state]
-  [(->Ok value input state)])
+(defn ok
+  ([value input state] [(->Ok value input state)])
+  ([value] (fn [input state] (ok value input state))))
 (defn ok? [x] (instance? Ok x))
 
 (defn parse-one [parser input & [state]]
   (parser input (or state (make-state))))
 
 (def done? (comp empty? :input))
-(defn extract [x]
-  (cond (ok? x) (:value x)
-        :else (throw (ex-info "Parser failure" (into {} x)))))
 
 (defn parse-all [parser input]
-  (let [mrf (atom nil)]
+  (let [mrf (atom nil)
+        dref (fn [x]
+               (cond (ok? x) (:value x)
+                     :else (throw (ex-info "Parser failure" (into {} x)))))]
     (->> (sequence
            (comp (filter done?)
                  (map #(do (when (fail? %)
@@ -40,11 +41,9 @@
                  (filter ok?))
            (parse-one parser input (make-state)))
       first (#(or % @mrf))
-      extract)))
+      dref)))
 
-(defn return [v]
-  (fn [input state]
-     (ok v input state)))
+(defn return [v] (ok v))
 
 (defn any< [input state]
   (if (empty? input) (fail ::empty [] state)
