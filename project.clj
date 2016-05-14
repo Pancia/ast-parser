@@ -4,7 +4,7 @@
                  [org.omcljs/om "1.0.0-alpha32" :scope "provided"]
                  [navis/untangled-spec "0.3.6" :scope "test"]]
 
-  :plugins [[com.jakemccrary/lein-test-refresh "0.14.0"]]
+  :plugins [[com.jakemccrary/lein-test-refresh "0.15.0"]]
 
   :test-refresh {:report untangled-spec.reporters.terminal/untangled-report
                  :with-repl true
