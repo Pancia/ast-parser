@@ -6,6 +6,8 @@
             [synfnetic.funk]
             ))
 
+#?(:cljs (enable-console-print!))
+
 (def ^:dynamic *dbg* false)
 (defn dbg
   ([tag x] (when *dbg* (print ";") (prn tag x)) x)

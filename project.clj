@@ -2,7 +2,7 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.8.51"]
                  [org.omcljs/om "1.0.0-alpha32" :scope "provided"]
-                 [navis/untangled-spec "0.3.6" :scope "test"]]
+                 [navis/untangled-spec "0.3.7-SNAPSHOT" :scope "test"]]
 
   :plugins [[com.jakemccrary/lein-test-refresh "0.15.0"]]
 

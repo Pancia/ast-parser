@@ -2,4 +2,5 @@
   (:require
     synfnetic.core-spec
     synfnetic.parser-spec
-    synfnetic.funk-spec))
+    synfnetic.funk-spec
+    ))
