@@ -1,4 +1,5 @@
-(ns synfnetic.macros)
+(ns synfnetic.macros
+  (:require [synfnetic.parser :as syn]))
 
 (defn cljs-env?
   "https://github.com/Prismatic/schema/blob/master/src/clj/schema/macros.clj"
@@ -16,10 +17,21 @@
                              (meta '~k)))
                @~vr))))
 
-(defmacro import-vars [[_ ns-sym]]
+(def ^{:doc "(... ns1 [ns2 [asdf]] ...) => [[ns1 :all] [ns2 [asdf]]]"}
+  import-vars<
+  (syn/plus<
+    (syn/<|> (syn/fmap #(vector % :all)
+                       (syn/when< symbol?))
+             (syn/when< (every-pred vector?
+                                    #(every? symbol? (second %)))))))
+
+(syn/defsyntax import-vars "imports vars from the specified nss"
+  [nss <- import-vars<]
   (let [cljs? (cljs-env? &env)
         -ns-interns- (if cljs?
                        cljs.analyzer.api/ns-interns
                        ns-interns)]
-    `(do ~@(->> (-ns-interns- ns-sym)
-             (map (fn [[k vr]] (import* k vr ns-sym cljs?)))))))
+    `(do ~@(vec (mapcat (fn [[ns-sym _]]
+                          (->> (-ns-interns- ns-sym)
+                            (map (fn [[k vr]] (import* k vr ns-sym cljs?)))))
+                        nss)))))

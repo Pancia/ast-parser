@@ -3,7 +3,7 @@
              [synfnetic.parser-spec :refer [asserts complex]]))
   (:require [untangled-spec.core #?(:clj :refer :cljs :refer-macros)
              [specification component behavior assertions]]
-            [synfnetic.core :as src
+            [synfnetic.parser :as src
              #?(:clj :refer :cljs :refer-macros)
              [m-do defsyntax defsynfn synfn]])
   #?(:clj (:import (clojure.lang ExceptionInfo))))

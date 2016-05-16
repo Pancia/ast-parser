@@ -10,9 +10,8 @@
 
 (def ^:dynamic *dbg* false)
 (defn dbg
-  ([tag x] (when *dbg* (print ";") (prn tag x)) x)
+  ([tag x] (when *dbg* (prn tag x)) x)
   ([x] (dbg :dbg x)))
 
-;(println ";" (macroexpand '(import-vars 'synfnetic.parser)))
-(import-vars 'synfnetic.parser)
-(import-vars 'synfnetic.funk)
+;(println (macroexpand '(import-vars synfnetic.parser synfnetic.funk)))
+(import-vars synfnetic.parser synfnetic.funk)

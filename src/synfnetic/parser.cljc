@@ -146,13 +146,26 @@
              (return ((fn [] ~@body))))
        args#)))
 
-#?(:clj (defmacro defsyntax [n arglist & body]
-          `(defmacro ~n [& args#]
-             (~(syn* arglist body) args#))))
+(defn def< [n ?meta arglist body]
+  (cond (vector? ?meta) ;;arglist
+        [n ?meta (cons arglist body)]
+        (string? ?meta) ;;doc string
+        [(with-meta n {:doc (str n " is parsed by: "
+                                 (doall (into [] (partition 3 arglist)))
+                                 " \n " ?meta)})
+         arglist body]
+        :else (assert false "invalid arguments to def<")))
 
-#?(:clj (defmacro defsynfn [n arglist & body]
-          `(defn ~n [& args#]
-             (~(syn* arglist body) args#))))
+#?(:clj (defmacro defsyntax [n ?meta arglist & body]
+          (let [[n arglist body] (def< n ?meta arglist body)]
+            `(defmacro ~n
+               [& args#]
+               (~(syn* arglist body) args#)))))
+
+#?(:clj (defmacro defsynfn [n ?meta arglist & body]
+          (let [[n arglist body] (def< n ?meta arglist body)]
+            `(defn ~n [& args#]
+               (~(syn* arglist body) args#)))))
 
 #?(:clj (defmacro synfn [arglist & body]
           `(fn [& args#]
