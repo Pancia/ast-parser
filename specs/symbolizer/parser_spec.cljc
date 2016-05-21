@@ -1,9 +1,9 @@
-(ns synfnetic.parser-spec
+(ns symbolizer.parser-spec
   #?(:cljs (:require-macros
-             [synfnetic.parser-spec :refer [asserts complex]]))
+             [symbolizer.parser-spec :refer [asserts complex]]))
   (:require [untangled-spec.core #?(:clj :refer :cljs :refer-macros)
              [specification component behavior assertions]]
-            [synfnetic.parser :as src
+            [symbolizer.parser :as src
              #?(:clj :refer :cljs :refer-macros)
              [m-do defsyntax defsynfn synfn]])
   #?(:clj (:import (clojure.lang ExceptionInfo))))

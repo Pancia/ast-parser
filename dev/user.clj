@@ -6,7 +6,7 @@
     [clojure.pprint :refer [pprint]]
     [clojure.stacktrace :refer [print-stack-trace]]
     [clojure.java.io :as io]
-    [synfnetic.core :as src]))
+    [symbolizer.core :as src]))
 
 ;; ==================== FIGWHEEL ====================
 

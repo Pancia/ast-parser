@@ -1,7 +1,7 @@
-(ns synfnetic.funk-spec
+(ns symbolizer.funk-spec
   (:require [untangled-spec.core #?(:clj :refer :cljs :refer-macros)
              [specification component behavior assertions]]
-            [synfnetic.funk :refer
+            [symbolizer.funk :refer
              [varargs p ID T F flip juxt-> truthify map-vals]]))
 
 (specification "helper functions!"

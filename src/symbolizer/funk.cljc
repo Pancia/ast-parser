@@ -1,4 +1,4 @@
-(ns synfnetic.funk)
+(ns symbolizer.funk)
 
 (defn map-vals
   "Generate a new map resulting from the application of `f` on each value of map `m`."

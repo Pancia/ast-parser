@@ -1,12 +1,12 @@
-(ns synfnetic.macros-spec
+(ns symbolizer.macros-spec
   (:require [untangled-spec.core :refer
              [specification behavior assertions when-mocking]]
-            [synfnetic.macros :as src]
-            [synfnetic.parser :as syn]
-            synfnetic.funk))
+            [symbolizer.macros :as src]
+            [symbolizer.parser :as syn]
+            symbolizer.funk))
 
 (def funk-syms
-  (map first (ns-interns 'synfnetic.funk)))
+  (map first (ns-interns 'symbolizer.funk)))
 
 (specification "import-vars<"
   (assertions
@@ -26,7 +26,7 @@
       (when-mocking
         (intern _ k _) => (swap! syms conj k)
         (assertions
-          (do (src/import-vars synfnetic.funk)
+          (do (src/import-vars symbolizer.funk)
               @syms)
           => funk-syms))))
   (behavior "in cljs defs symbols found in the analyzers' ns-interns"
@@ -36,6 +36,6 @@
         (cljs.analyzer.api/ns-interns -ns-) => (->> (ns-interns -ns-)
                                                  (mapv #(update % 1 meta)))
         (assertions
-          (rest (macroexpand '(synfnetic.macros/import-vars synfnetic.funk)))
-          => (mapv #(vector 'def % (symbol "synfnetic.funk" (name %)))
+          (rest (macroexpand '(symbolizer.macros/import-vars symbolizer.funk)))
+          => (mapv #(vector 'def % (symbol "symbolizer.funk" (name %)))
                    funk-syms))))))

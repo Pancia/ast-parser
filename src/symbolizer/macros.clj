@@ -1,5 +1,5 @@
-(ns synfnetic.macros
-  (:require [synfnetic.parser :as syn]))
+(ns symbolizer.macros
+  (:require [symbolizer.parser :as syn]))
 
 (defn cljs-env?
   "https://github.com/Prismatic/schema/blob/master/src/clj/schema/macros.clj"

@@ -1,9 +1,9 @@
-(ns synfnetic.spec-main
+(ns symbolizer.spec-main
   (:require-macros
     [untangled-spec.reporters.suite :as ts])
   (:require
     untangled-spec.reporters.impl.suite
-    synfnetic.tests-to-run))
+    symbolizer.tests-to-run))
 
 (enable-console-print!)
 

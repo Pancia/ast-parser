@@ -1,8 +1,8 @@
-(defproject synfnetic "0.1.0-SNAPSHOT"
+(defproject synfnetic/symbolizer "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.8.51"]
                  [org.omcljs/om "1.0.0-alpha32" :scope "provided"]
-                 [navis/untangled-spec "0.3.7-SNAPSHOT" :scope "test"]]
+                 [navis/untangled-spec "0.3.6" :scope "test"]]
 
   :plugins [[com.jakemccrary/lein-test-refresh "0.15.0"]]
 
@@ -17,7 +17,7 @@
   :cljsbuild {:builds [{:id           "test"
                         :source-paths ["specs" "src"]
                         :figwheel     true
-                        :compiler     {:main                 synfnetic.spec-main
+                        :compiler     {:main                 symbolizer.spec-main
                                        :output-to            "resources/public/js/specs/specs.js"
                                        :output-dir           "resources/public/js/compiled/specs"
                                        :asset-path           "js/compiled/specs"
