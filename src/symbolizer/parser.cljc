@@ -1,6 +1,6 @@
-(ns symbolizer.parser
+(ns syntaxic.parser
   ;; FOR ACCESS TO MACROS, DO NOT DELETE
-  #?(:cljs (:require-macros [symbolizer.parser :refer [m-do]]))
+  #?(:cljs (:require-macros [syntaxic.parser :refer [m-do]]))
   (:require [clojure.set :as set]))
 
 (defrecord State [seen])

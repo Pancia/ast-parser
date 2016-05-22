@@ -1,5 +1,5 @@
-(ns symbolizer.tests-to-run
+(ns syntaxic.tests-to-run
   (:require
-    symbolizer.core-spec
-    symbolizer.parser-spec
+    syntaxic.core-spec
+    syntaxic.parser-spec
     ))

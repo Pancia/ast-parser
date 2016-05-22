@@ -1,4 +1,4 @@
-(defproject synfnetic/symbolizer "0.1.0-SNAPSHOT"
+(defproject synfnetic/syntaxic "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.8.51"]
                  [org.omcljs/om "1.0.0-alpha32" :scope "test"]
@@ -18,7 +18,7 @@
   :cljsbuild {:builds [{:id           "test"
                         :source-paths ["specs" "src"]
                         :figwheel     true
-                        :compiler     {:main                 symbolizer.spec-main
+                        :compiler     {:main                 syntaxic.spec-main
                                        :output-to            "resources/public/js/specs/specs.js"
                                        :output-dir           "resources/public/js/compiled/specs"
                                        :asset-path           "js/compiled/specs"

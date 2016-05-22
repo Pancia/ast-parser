@@ -1,1 +1,1 @@
-# Hello symbolizer
+# Hello syntaxic
