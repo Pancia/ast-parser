@@ -2,5 +2,4 @@
   (:require
     symbolizer.core-spec
     symbolizer.parser-spec
-    symbolizer.funk-spec
     ))
